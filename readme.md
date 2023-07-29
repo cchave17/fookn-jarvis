@@ -1,1 +1,1 @@
-Yeah, dont take the api in the previous commit. it wont work. 
+Yeah, dont take the api key from the previous commit. it wont work. 
