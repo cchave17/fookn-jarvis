@@ -75,4 +75,4 @@ async def close_ticket(ctx):
         await existing_channel.delete(reason="Ticket closed.")
         print("Ticket channel deleted.")
 
-bot.run('MTEzNDcxMTg4NDk4NjE4Nzg0OQ.G_ujyG.nu1rDxxeBXxkrkKUC_-bzEp2BfS0cTCc3Z1ZaE')
+bot.run('fuck_me_key')
