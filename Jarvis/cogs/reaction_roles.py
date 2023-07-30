@@ -1,5 +1,11 @@
+import os
 import discord
 from discord.ext import commands
+
+GUILD_ID = os.getenv("GUILD_ID")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+MESSAGE_ID = os.getenv("MESSAGE_ID")
+LOG_CHANNEL_ID = os.getenv("LOG_CHANNEL_ID")
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -7,15 +13,10 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        guild_id = 1127046052156018818
-        channel_id= 1134688234018971769
-        message_id = 1134734670693675128
-        log_channel_id = 1134782095022104587
-
-        if payload.guild_id != guild_id or payload.channel_id != channel_id or payload.message_id != message_id:
+        if str(payload.guild_id) != GUILD_ID or str(payload.channel_id) != CHANNEL_ID or str(payload.message_id) != MESSAGE_ID:
             return
 
-        guild = discord.utils.find(lambda g : g.id == guild_id, self.bot.guilds)
+        guild = discord.utils.find(lambda g : str(g.id) == GUILD_ID, self.bot.guilds)
     
         if payload.event_type == 'REACTION_ADD':
             role = discord.utils.get(guild.roles, name="Couch Potato")
@@ -23,21 +24,16 @@ class ReactionRoles(commands.Cog):
                 member = guild.get_member(payload.user_id)
                 if member is not None:
                     await member.add_roles(role)
-                    log_channel = self.bot.get_channel(log_channel_id)
+                    log_channel = self.bot.get_channel(int(LOG_CHANNEL_ID))
                     await log_channel.send(f'Role {role.name} added to user {member.name}')
-                    print("done")
+                    print("added role done")
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        guild_id = 1127046052156018818
-        channel_id= 1134688234018971769
-        message_id = 1134734670693675128
-        log_channel_id = 1134782095022104587
-
-        if payload.guild_id != guild_id or payload.channel_id != channel_id or payload.message_id != message_id:
+        if str(payload.guild_id) != GUILD_ID or str(payload.channel_id) != CHANNEL_ID or str(payload.message_id) != MESSAGE_ID:
             return
 
-        guild = discord.utils.find(lambda g : g.id == guild_id, self.bot.guilds)
+        guild = discord.utils.find(lambda g : str(g.id) == GUILD_ID, self.bot.guilds)
 
         if payload.event_type == 'REACTION_REMOVE':
             role = discord.utils.get(guild.roles, name="Couch Potato")
@@ -45,6 +41,6 @@ class ReactionRoles(commands.Cog):
                 member = guild.get_member(payload.user_id)
                 if member is not None:
                     await member.remove_roles(role)
-                    log_channel = self.bot.get_channel(log_channel_id)
+                    log_channel = self.bot.get_channel(int(LOG_CHANNEL_ID))
                     await log_channel.send(f'Role {role.name} removed from user {member.name}')
-                    print("done")
+                    print("remove role done")

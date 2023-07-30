@@ -2,3 +2,4 @@ discord.py
 openai
 requests
 python-dotenv
+discord-py-slash-command
