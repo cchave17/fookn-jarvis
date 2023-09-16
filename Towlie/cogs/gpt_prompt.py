@@ -12,7 +12,7 @@ class GptPrompt(commands.Cog):
     @commands.command()
     @commands.has_any_role('DEV','Jarvis', 'Assistant to the Assistant Regional Manager','Weekend Shift Supervisor', 'OWL (Original Wave Lounger)', 'Cartman (WoW Episode)','Steamed Broccoli', 'Couch Potato')
     async def ask(self, ctx, *, prompt):
-        if ctx.channel.id != os.getenv("GPT_CHANNEL"):
+        if ctx.channel.id != int(os.getenv("GPT_CHANNEL")):
             log_channel = self.bot.get_channel(self.log_channel_id)
             await log_channel.send(f'{ctx.message.author} tried to access GPT in channel {ctx.channel.name}')
 
@@ -23,7 +23,7 @@ class GptPrompt(commands.Cog):
         chat_completion = openai.ChatCompletion.create(
             model="gpt-4-0613",
             messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
-            max_tokens=200,
+            max_tokens=500,
             temperature=0.7,
             presence_penalty=0.2,
             frequency_penalty=0.2

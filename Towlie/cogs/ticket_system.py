@@ -25,7 +25,7 @@ class TicketSystem(commands.Cog):
 
             ticket_channel = await ctx.guild.create_text_channel(ticket_channel_name, overwrites=overwrites)
             await ticket_channel.send(f"New ticket created by {ctx.message.author.mention}")
-            log_channel = self.bot.get_channel(os.getenv("LOG_CHANNEL_ID"))
+            log_channel = self.bot.get_channel(int(os.getenv("LOG_CHANNEL_ID")))
             await log_channel.send(f"New ticket created by {ctx.message.author.mention}")
             print("Ticket channel created.")
 

@@ -1,0 +1,46 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'ff8edd99-107c-4eb1-8253-7b7c67c99100'
+  imageRepository: 'towliebotimage'
+  containerRegistry: 'thelounge.azurecr.io'
+  dockerfilePath: './Dockerfile'
+  tag: '$(Build.BuildId)'
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+  # Add this line to import your variable group
+  group: 'TowelieBotSecrets'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+    - script: |
+        sed -i 's/:latest/:$(tag)/' k8s/deployment.yaml
+      displayName: 'Update image tag in deployment file'
+    - task: KubernetesManifest@1
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'prod-futbolpapi_tech_cluster-prod-1690700907957'
+        namespace: 'prod'
+        manifests: 'k8s/*.yaml'

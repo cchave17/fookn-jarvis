@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: towelie-bot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: towelie-bot
+  template:
+    metadata:
+      labels:
+        app: towelie-bot
+    spec:
+      containers:
+      - name: towelie-bot
+        image: thelounge.azurecr.io/towliebotimage:latest
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: towelie-bot-secrets
+      imagePullSecrets:
+      - name: acr-auth
+
