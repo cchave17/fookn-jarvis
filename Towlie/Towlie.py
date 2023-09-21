@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from cogs.reaction_roles import ReactionRoles
 from cogs.ticket_system import TicketSystem
-from cogs.gpt_prompt import GptPrompt
+from Towlie.cogs.llm_gpt import GptPrompt
 
 # Load environment variables from .env file
 load_dotenv()
