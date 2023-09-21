@@ -1,29 +1,67 @@
-import discord
 import os
 from dotenv import load_dotenv
-from discord.ext import commands
+from interactions import Client, slash_command
 from cogs.reaction_roles import ReactionRoles
 from cogs.ticket_system import TicketSystem
 from cogs.gpt_prompt import GptPrompt
-from cogs.translator import TranslatorBot
 
-# Load environment variables from .env file
+import openai
 load_dotenv()
 
-intents = discord.Intents.all()
+gpt_message_history = [{"role": "system", "content": "You are a chatbot."}]
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = Client()
 
-gpt_message_history = [{"role": "system", "content": "You are an incredibly sarcastic and misanthropic language model, duty bound to answer human's stupid questions."}]
+@slash_command(name="ask", description="Talk to Chat GPT")
+async def ask(ctx, *, prompt):
+    print("prompt" + prompt)
+    channel = bot.get_channel(os.getenv("GPT_CHANNEL")) 
 
-print(os.environ)
+    if channel:
+        global gpt_message_history
+        openai.api_key = (os.getenv("OPENAI_API_KEY"))
+        gpt_message_history.append({"role": "user", "content": prompt})
+        print(gpt_message_history)
+        
+        chat_completion = openai.ChatCompletion.create(
+            model="gpt-4-0613",
+            messages=gpt_message_history,
+            max_tokens=2000,
+            temperature=0.7,
+            presence_penalty=0.2,
+            frequency_penalty=0.2
+        )
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} is connected to Discord!')
-    await bot.add_cog(ReactionRoles(bot))
-    await bot.add_cog(TicketSystem(bot))
-    await bot.add_cog(GptPrompt(bot))
-    await bot.add_cog(TranslatorBot(bot))
+        gpt_message_history.append(chat_completion['choices'][0]['message'])
+        print(gpt_message_history)
 
-bot.run(os.getenv('TOWLIE_TOKEN'))
+        response = chat_completion['choices'][0]['message']['content']
+        await ctx.send(f"{ctx.message.author.mention} {response}")
+    else:
+        await ctx.send("Could not find the specified channel")
+
+
+@slash_command(name="nahnsu",description="Hi Nahnsu, ur cutte")
+async def testing_command(ctx):
+    # Fetch the desired channel
+    channel = bot.get_channel(1134955892362719332) 
+
+    # Check if channel exists
+    if channel:
+        # Send a message to the channel
+        await channel.send("hello world")
+    else:
+        await ctx.send("Could not find the specified channel")
+
+@bot.listen()
+async def on_startup():
+    print("Bot is ready!")
+
+# @bot.event
+# async def on_ready():
+#     print(f'{bot.user} is connected to Discord!')
+#     await bot.add_cog(ReactionRoles(bot))
+#     await bot.add_cog(TicketSystem(bot))
+#     await bot.add_cog(GptPrompt(bot))
+
+bot.start(os.getenv('TOWLIE_TOKEN'))
