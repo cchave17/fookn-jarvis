@@ -2,6 +2,8 @@ import os
 import openai
 from discord.ext import commands
 
+gpt_message_history = [{"role": "system", "content": "You are a helpful assistant."}]
+
 
 class GptPrompt(commands.Cog):
     def __init__(self, bot):
@@ -20,14 +22,21 @@ class GptPrompt(commands.Cog):
             await ctx.send(f'{ctx.message.author.mention} that command is only acceptable in the {correct_channel.name} channel')
             return
         
+        global gpt_message_history
+        gpt_message_history.append({"role": "user", "content": prompt})
+        
         chat_completion = openai.ChatCompletion.create(
             model="gpt-4-0613",
-            messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+            messages=gpt_message_history,
             max_tokens=500,
             temperature=0.7,
             presence_penalty=0.2,
             frequency_penalty=0.2
         )
+
+        print(chat_completion['choices'][0]['message'])
+
+        gpt_message_history.append(chat_completion['choices'][0]['message'])
 
         response = chat_completion['choices'][0]['message']['content']
         await ctx.send(f"{ctx.message.author.mention} {response}")
