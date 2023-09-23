@@ -1,6 +1,4 @@
-discord.py
 openai
 requests
 python-dotenv
-discord-py-slash-command
-googletrans
+discord-py-interactions
