@@ -41,7 +41,7 @@ async def ask(ctx, *, prompt):
         await ctx.send("Could not find the specified channel")
 
 
-@slash_command(name="nahnsu",description="Hi Nahnsu, ur cutte")
+@slash_command(name="nahnsu",description="Hi Nahnsu")
 async def testing_command(ctx):
     # Fetch the desired channel
     channel = bot.get_channel(1134955892362719332) 
